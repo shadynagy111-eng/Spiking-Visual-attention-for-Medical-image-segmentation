@@ -85,4 +85,4 @@ For inquiries or collaborations, reach out via:
 - 🔗 LinkedIn: [Mostafa Ahmed](https://www.linkedin.com/in/mostafaahmedgalal/)
 
 ---
-_This project is part of our research on **bio-inspired neural networks for medical imaging**._ 🎯
+_This project is part of our research on **spiking neural networks for medical imaging**._ 🎯
