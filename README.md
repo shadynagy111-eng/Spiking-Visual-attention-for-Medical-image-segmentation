@@ -74,7 +74,7 @@ If you use this work in your research, please cite:
 @article{spiking2025,
   title={Spiking Neural Network for Visual Attention in Medical Imaging},
   author={Mostafa Ahmed, Mohammed Abdel-Megeed, Shady Ahmed},
-  journal={German University in Cairo},
+  journal={_____},
   year={2025}
 }
 ```
