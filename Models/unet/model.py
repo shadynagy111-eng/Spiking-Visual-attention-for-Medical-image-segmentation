@@ -10,7 +10,7 @@ import torchvision.transforms.functional as TF
 #     print("CUDA Version:", torch.version.cuda)
 #     print("Total GPU Memory:", torch.cuda.get_device_properties(0).total_memory / 1e9, "GB")
 
-class DoubleConv(nn.Module):
+class DoubleConv(nn.Module): # [conv -> batchnorm -> ReLU] x 2
 
     def __init__(self, in_channel, out_channel):
         super(DoubleConv, self).__init__()
