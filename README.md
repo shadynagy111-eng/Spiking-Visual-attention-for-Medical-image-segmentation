@@ -51,7 +51,7 @@ The model integrates a **Convolutional Spiking Neural Network (CSNN)** for featu
    ```
 3. Run training:
    ```sh
-   python train.py --dataset path/to/dataset --epochs 50
+   python train.py 
    ```
 
 ## 📊 Results & Comparisons
