@@ -15,13 +15,13 @@ from model import UNET
 
 Learning_rate = 1e-4
 Device = "cuda" if torch.cuda.is_available() else "cpu"
-Batch_size = 16
-num_epochs = 2
+Batch_size = 32
+num_epochs = 1
 num_workers = 4
-IMAGE_HEIGHT = 128 # 512 originally
-IMAGE_WIDTH = 128 # 512 originally
+IMAGE_HEIGHT = 64 # 512 originally
+IMAGE_WIDTH = 64 # 512 originally
 PIN_MEMORY = True
-LOAD_MODEL = False
+LOAD_MODEL = True
 IMG_DIR = "E:/Code/MRI-Segmentation-Preprocess/Brain Tumor Segmentation/images"
 MASK_DIR = "E:/Code/MRI-Segmentation-Preprocess/Brain Tumor Segmentation/masks"
 VAL_IMG_DIR = "E:/Code/MRI-Segmentation-Preprocess/Brain Tumor Segmentation/val_images"
@@ -95,7 +95,7 @@ def main():
     if LOAD_MODEL:
         load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
 
-    # check_accuracy(val_loader, model, device=Device)
+        check_accuracy(val_loader, model, device=Device)
 
     scaler = torch.amp.GradScaler()
 
@@ -116,7 +116,6 @@ def main():
         save_predictions_as_imgs(
             val_loader, model, folder="saved_images/", device=Device
         )
-
 
 
 if __name__ == "__main__": 

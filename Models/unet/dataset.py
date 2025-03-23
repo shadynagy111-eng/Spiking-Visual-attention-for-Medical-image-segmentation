@@ -21,7 +21,7 @@ class BrainTumorSegmentationDataset(Dataset):
         # it is already single channel greyscale image but if we need
         # we can with .convert("L")
         image = np.array(Image.open(image_path)) 
-        mask = np.array(Image.open(mask_path))
+        mask = np.array(Image.open(mask_path).convert("L"), dtype=np.float32)
 
         # we have only 2 classes with segmoid for last activation
         mask[mask == 255.0] = 1.0 

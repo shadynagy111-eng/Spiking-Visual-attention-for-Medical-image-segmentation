@@ -43,7 +43,7 @@ class UNET(nn.Module):
             
         for feature in reversed(features):
             self.ups.append(
-                nn.ConvTranspose2d(feature*2, feature, kernel_size=2, stride=2)
+                nn.ConvTranspose2d(feature*2, feature, kernel_size=2, stride=2) #up-conv
             )
             self.ups.append(DoubleConv(feature*2, feature))
 

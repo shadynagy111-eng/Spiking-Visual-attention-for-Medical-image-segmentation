@@ -1,3 +1,4 @@
-1- Download dataset from Kaggle: https://www.kaggle.com/datasets/nikhilroxtomar/brain-tumor-segmentation
-2- then extract into 2 folders "images" and "masks"
-
+1- download dataset from Kaggle: https://www.kaggle.com/datasets/nikhilroxtomar/brain-tumor-segmentation
+2- then extract the data, it should be 2 folders "images" and "masks"
+3- create 2 folders "val_images" and "val_masks" 
+4- add inside this them any validations you want from the dataset 
