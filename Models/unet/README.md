@@ -24,19 +24,60 @@ UNet is a convolutional neural network that was developed for biomedical image s
 
 ### Training
 
-To train the model, run the following command:
+To train the model, open the `train.ipynb` Jupyter Notebook and execute the cells in sequence. Ensure that all dependencies are installed and the dataset paths are correctly configured before running the notebook.
 
-```bash
-python train.py
+
+## Results
+
+### Training Parameters
+
+The following training parameters were used:
+
+- **Device**: `cuda` (if available) or `cpu`
+- **Learning Rate**: `1e-3`
+- **Batch Size**: `32`
+- **Number of Epochs**: `5`
+- **Number of Workers**: `4`
+- **Image Dimensions**: `256x256` (originally `512x512`)
+- **Pin Memory**: `True`
+- **Load Model**: `False`
+- **Checkpoint Name**: `None`
+
+### Dataset Paths
+
+Ensure that your dataset is organized in the following structure and update the paths in your code accordingly:
+
+- **Image Directory**: `./Brain Tumor Segmentation/images`
+- **Mask Directory**: `./Brain Tumor Segmentation/masks`
+- **Validation Image Directory**: `./Brain Tumor Segmentation/val_images`
+- **Validation Mask Directory**: `./Brain Tumor Segmentation/val_masks`
+
+If your dataset is stored on a different drive or path, replace the above paths with your specific drive path. For example:
+
+```plaintext
+D:/Your/Custom/Path/images
+D:/Your/Custom/Path/masks
+D:/Your/Custom/Path/val_images
+D:/Your/Custom/Path/val_masks
 ```
 
-### Testing
+Update the corresponding variables in the code to reflect your drive path.
 
-To test the model, run the following command:
+### Quantitative Results
 
-```bash
-python test.py
-```
+| Metric           | Value  |
+|------------------|--------|
+| Dice Coefficient | 0.7354 |
+| Accuracy         | 99.28  |
+
+### Qualitative Results
+
+Below are some sample segmentation results:
+
+#### Plot Samples
+![Plot Sample1](./../../assets/output-0-20250326-054245.png)
+![Plot Sample2](./../../assets/output-0-20250326-054249.png)
+![Plot Sample3](./../../assets/output-0-20250326-054255.png)
 
 ## Directory Structure
 
@@ -44,11 +85,17 @@ python test.py
 ├── Models
 │   ├── unet
 │   │   ├── model.py
-│   │   ├── train.py
-│   │   ├── README.md
+│   │   ├── utils.py
+│   │   ├── dataset.py
+│   │   ├── train.ipynb
+│   │   ├── README.md    
+│   │   ├── checkpoints    
+│   │   ├── saved_images            
+│   │   └── ...
 │   └── ...
 ├── assets
 │   ├── unet_arch.png
+│   └── ...
 └── ...
 ```
 
