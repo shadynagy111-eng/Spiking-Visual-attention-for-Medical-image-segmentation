@@ -137,6 +137,7 @@ cython_debug/
 
 *.pth.tar
 Models/unet/saved_images/*
+Models/unet/gradcam_results/*
 datasets/Brain Tumor Segmentation/*
 datasets/notebooks/*.gif
 checkpoints/*
