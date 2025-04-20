@@ -5,47 +5,37 @@ from torch.utils.data import DataLoader
 import os
 from datetime import datetime
 import matplotlib.pyplot as plt
+import random as rand
 
-CHECKPOINT_DIR = "checkpoints"
+rand.seed(55)
 
-# def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
-#     print("=> Saving checkpoint")
-#     torch.save(state, filename)
+CHECKPOINT_DIR = "U_Net_checkpoints"
+THRESHOLD = 0.4
 
 def save_checkpoint(state):
-    # Ensure the directory exists
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
-    # Get the current date and time
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    # Get the next available checkpoint ID
     existing_files = os.listdir(CHECKPOINT_DIR)
     checkpoint_ids = [
-        int(f.split("_")[1]) for f in existing_files if f.startswith("checkpoint_")
+        int(f.split("_")[3]) for f in existing_files if f.startswith("U_Net_checkpoint_")
     ]
-    next_id = max(checkpoint_ids, default=0) + 1  # Start from 1 if empty
+    next_id = max(checkpoint_ids, default=0) + 1 
 
-    # Create filename: checkpoint_<id>_<timestamp>.pth.tar
-    checkpoint_filename = f"checkpoint_{next_id}_{timestamp}.pth.tar"
+    checkpoint_filename = f"U_Net_checkpoint_{next_id}_{timestamp}.pth.tar"
     checkpoint_path = os.path.join(CHECKPOINT_DIR, checkpoint_filename)
 
-    # Save checkpoint
     torch.save(state, checkpoint_path)
     print(f"✅ Checkpoint saved: {checkpoint_filename}")
 
-# def load_checkpoint(checkpoint, model):
-#     print("=> Loading checkpoint")
-#     model.load_state_dict(checkpoint["state_dict"])
-
 def load_checkpoint(model, optimizer, checkpoint_name=None):
     if checkpoint_name is None:
-        # Get the list of all saved checkpoints
-        files = sorted(os.listdir(CHECKPOINT_DIR), reverse=True)  # Sort newest first
+        files = sorted(os.listdir(CHECKPOINT_DIR), reverse=True)  
         if not files:
             print("❌ No checkpoints found!")
             return
-        checkpoint_name = files[0]  # Pick the latest checkpoint
+        checkpoint_name = files[0]  
 
     checkpoint_path = os.path.join(CHECKPOINT_DIR, checkpoint_name)
 
@@ -110,54 +100,113 @@ def check_accuracy(loader, model, device="cuda"):
     with torch.no_grad():
         for x, y in loader:
             x = x.to(device)
-            y = y.to(device).unsqueeze(1) # unsqueeze for 1 channel
+            y = y.to(device).unsqueeze(1) 
             preds = torch.sigmoid(model(x))
-            preds = (preds >= 0.4).float()
+            preds = (preds >= THRESHOLD).float()
             num_correct += (preds == y).sum()
             num_pixels += torch.numel(preds)
             dice_score += (2 * (preds * y).sum()) / ((preds + y).sum() + 1e-8)
+
+    val_acc= num_correct/num_pixels*100 
+    val_dice= dice_score/len(loader)
+    
     print(
-        f"Got {num_correct}/{num_pixels} with acc {num_correct/num_pixels*100:.2f}"
+        f"Got {num_correct}/{num_pixels} with acc {val_acc : .2f}"
     )
-    print(f"Dice score: {dice_score/len(loader)}")
+    print(f"Dice score: {val_dice}")
+
     model.train()
 
+    return val_acc, val_dice
+ 
 def save_predictions_as_imgs(
-    loader, model, folder="saved_images/", device="cuda", show_last_epoch=False
+    loader, 
+    model, 
+    checkpoint_filename, 
+    train_losses, 
+    val_accs, 
+    val_dice_scores, 
+    folder="U_Net_saved_images/", 
+    device="cuda", 
+    show_last_epoch=False, 
 ):
-    new_folder = os.path.join(folder, "MatplotOutputs/")
+    folder  = os.path.join(folder, checkpoint_filename)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    new_folder = os.path.join(folder, "U_Net_MatplotOutputs/")
     if not os.path.exists(new_folder):
         os.makedirs(new_folder)
     
     model.eval()
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+
     for idx, (x, y) in enumerate(loader):
+
         x = x.to(device=device)
         with torch.no_grad():
             preds = torch.sigmoid(model(x))
-            preds = (preds >= 0.4).float()
+            preds = (preds >= THRESHOLD).float()
         
         torchvision.utils.save_image(
             preds, f"{folder}/pred_{idx}-{timestamp}.png"
         )
-        torchvision.utils.save_image(y.unsqueeze(1).to(torch.float32), f"{folder}/{idx}.png")
+        torchvision.utils.save_image(
+            y.unsqueeze(1).to(torch.float32), f"{folder}/{idx}.png"
+        )
+        torchvision.utils.save_image(
+            x.squeeze(0).to(torch.float32), f"{folder}/original_{idx}.png"
+        )
 
         if show_last_epoch:
-            for i in range(x.size(0)):
-                timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-                fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+            i = rand.randint(0, x.size(0)-1)
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            fig, ax = plt.subplots(1, 3, figsize=(12, 4))
 
-                ax[0].imshow(x[i].cpu().squeeze(0), cmap='gray')
-                ax[0].set_title('Input Image')
+            ax[0].imshow(x[i].cpu().squeeze(0), cmap='gray')
+            ax[0].set_title('Input Image')
 
-                ax[1].imshow(y[i].cpu().squeeze(), cmap='gray')
-                ax[1].set_title('Ground Truth')
+            ax[1].imshow(y[i].cpu().squeeze(), cmap='gray')
+            ax[1].set_title('Ground Truth')
 
-                ax[2].imshow(preds[i].cpu().squeeze(), cmap='gray')
-                ax[2].set_title('Prediction')
+            ax[2].imshow(preds[i].cpu().squeeze(), cmap='gray')
+            ax[2].set_title('Prediction')
 
-                fig.savefig(f"{new_folder}/output-{idx}-{timestamp}.png")
-                plt.show()
-                plt.close(fig)
+            fig.savefig(f"{new_folder}/output-0-batch-{idx}-{timestamp}.png")
+            plt.show()
+            plt.close(fig)
+            
+    if show_last_epoch:    
+        epochs = range(1,len(train_losses)+1)
+        plt.figure(figsize=(12,4))
+
+        #loss
+        plt.subplot(1,3,1)
+        plt.plot(epochs, train_losses, label='Training Loss')
+        plt.xlabel('Epoch')
+        plt.xticks(epochs)
+        plt.ylabel('Loss')
+        plt.title('Training Loss')
+        
+        #acc
+        plt.subplot(1,3,2)
+        plt.plot(epochs, val_accs, label='Val Accuracy', color='orange')
+        plt.xlabel('Epoch')
+        plt.xticks(epochs)
+        plt.ylabel('Accuracy')
+        plt.title('Validation Accuracy')
+        
+        #dice
+        plt.subplot(1,3,3)
+        plt.plot(epochs, val_dice_scores, label='Dice Score', color='green')
+        plt.xlabel('Epoch')
+        plt.xticks(epochs)
+        plt.ylabel('Dice')
+        plt.title('Dice Score')
+
+        plt.tight_layout()
+        plt.savefig(f"{folder}/results_metrics_{timestamp}.png")
+        plt.show()
+        plt.close()
 
     model.train()
+    

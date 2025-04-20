@@ -32,7 +32,3 @@ class BrainTumorSegmentationDataset(Dataset):
             mask = augmentations["mask"]
 
         return image, mask
-
-
-
-

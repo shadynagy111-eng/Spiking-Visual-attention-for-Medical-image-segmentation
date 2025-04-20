@@ -55,12 +55,11 @@ The model integrates a **Convolutional Spiking Neural Network (CSNN)** for featu
    ```
 
 ## 📊 Results & Comparisons
-| Model | Accuracy | Computation Time | Power Efficiency |
-|--------|-----------|------------------|------------------|
-| CNN | _____ | _____ | _____ |
-| SNN | _____ | _____ | _____ |
-| Hybrid CNN-SNN | _____ | _____ | _____ |
-
+| Model | Accuracy | Dice Score | Energy (Spikes or MACs) | Train Time | NASAR |
+|-------|----------|------------|-------------------------|------------|-------|
+| U-Net | _____ | _____ | _____ | _____ | N/A |
+| Attention-SNN | _____ | _____ | _____ | _____ | _____ |
+ 
 📌 **Key Takeaway:** _____
 
 ## 📌 Future Work

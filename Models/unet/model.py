@@ -2,15 +2,7 @@ import torch
 import torch.nn as nn
 import torchvision.transforms.functional as TF
 
-# print("PyTorch Version:", torch.__version__)
-# print("CUDA Available:", torch.cuda.is_available())
-
-# if torch.cuda.is_available():
-#     print("GPU Device Name:", torch.cuda.get_device_name(0))
-#     print("CUDA Version:", torch.version.cuda)
-#     print("Total GPU Memory:", torch.cuda.get_device_properties(0).total_memory / 1e9, "GB")
-
-class DoubleConv(nn.Module): # [conv -> batchnorm -> ReLU] x 2
+class DoubleConv(nn.Module):
 
     def __init__(self, in_channel, out_channel):
         super(DoubleConv, self).__init__()
