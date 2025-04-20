@@ -12,7 +12,7 @@ rand.seed(55)
 CHECKPOINT_DIR = "U_Net_checkpoints"
 THRESHOLD = 0.4
 
-def save_checkpoint(state):
+def save_checkpoint(state, is_best=False):
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -26,8 +26,12 @@ def save_checkpoint(state):
     checkpoint_filename = f"U_Net_checkpoint_{next_id}_{timestamp}.pth.tar"
     checkpoint_path = os.path.join(CHECKPOINT_DIR, checkpoint_filename)
 
-    torch.save(state, checkpoint_path)
-    print(f"✅ Checkpoint saved: {checkpoint_filename}")
+    if is_best:
+        torch.save(state, checkpoint_path)
+        print(f"✅ Checkpoint saved: {checkpoint_filename}")
+
+    return f"U_Net_checkpoint_{next_id}_{timestamp}"
+
 
 def load_checkpoint(model, optimizer, checkpoint_name=None):
     if checkpoint_name is None:
