@@ -300,36 +300,41 @@ class ResNet_origin(nn.Module):
         # input = torch.zeros(
         #     time_window, x.size()[0], 3, x.size()[2], x.size()[3], device=device
         # )
+
         input = torch.zeros(
               time_window, x.size()[0], x.size()[1], x.size()[2], x.size()[3], device=device
         )
+
         input = x.unsqueeze(0).repeat(time_window, 1, 1, 1, 1)  # [T, B, C, H, W]
+
         output = self.conv1(input)
-        # output = mem_update(output)
         output = self.conv2_x(output)
         output = self.conv3_x(output)
         output = self.conv4_x(output)
         output = self.conv5_x(output)
-        # Keep shape as [T, B, C, H, W]
+
         output = self.mem_update(output)
 
-        # Collapse over time: average membrane potentials across T
+        # output = output.permute(1, 0, 2, 3, 4)  # Shape: [B, T, C, H, W]
+        # output = output.reshape(-1, *output.shape[2:])  # Shape: [B*T, C, H, W]
+
+        # output = F.adaptive_avg_pool2d(output, (1, 1))  # Shape: [B*T, C, 1, 1]
+        # output = output.view(output.size(0), -1)        # Shape: [B*T, C]
+
         output = output.mean(dim=0)  # Shape: [B, C, H, W]
 
-        # print("-------------------------->",output.shape)  # before segmentation_head
-        # Pass to segmentation head
+        # output = F.interpolate(output, size=(256,256), mode="bilinear", align_corners=False)
+
         output = self.segmentation_head(output) 
-        # output = F.interpolate(output, size=(x.shape[2], x.shape[3]), mode="bilinear", align_corners=False)
+        
         return output
 
 
 def resnet18():
-
     return ResNet_origin(BasicBlock, [2, 2, 2, 2])
 
 
 def resnet34():
-    # return ResNet_origin(BasicBlock, [3, 4, 40, 3])
     return ResNet_origin(BasicBlock, [3, 4, 6, 3])
 
 

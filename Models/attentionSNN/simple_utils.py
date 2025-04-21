@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 import os
 from datetime import datetime
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import random as rand
 
 rand.seed(55)
@@ -12,7 +13,7 @@ rand.seed(55)
 CHECKPOINT_DIR = "Att_Res_SNN_checkpoints"
 THRESHOLD = 0.5
 
-def save_checkpoint(state):
+def save_checkpoint(state, is_best=False):
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -26,8 +27,12 @@ def save_checkpoint(state):
     checkpoint_filename = f"Att_Res_SNN_checkpoint_{next_id}_{timestamp}.pth.tar"
     checkpoint_path = os.path.join(CHECKPOINT_DIR, checkpoint_filename)
 
-    torch.save(state, checkpoint_path)
-    print(f"✅ Checkpoint saved: {checkpoint_filename}")
+    if is_best:
+        torch.save(state, checkpoint_path)
+        print(f"✅ Checkpoint saved: {checkpoint_filename}")
+    else:
+        print(f" Checkpoint not saved as best model.")
+
     return f"Att_Res_SNN_checkpoint_{next_id}_{timestamp}"
 
 def load_checkpoint(model, optimizer, checkpoint_name=None):
@@ -177,35 +182,44 @@ def save_predictions_as_imgs(
             plt.close(fig)
             
     if show_last_epoch:    
-        epochs = range(1,len(train_losses)+1)
-        plt.figure(figsize=(12,4))
+        epochs = range(1, len(train_losses) + 1)
 
-        #loss
-        plt.subplot(1,3,1)
+        # ----------- Training Loss Plot -----------
+        plt.figure(figsize=(10, 5))
         plt.plot(epochs, train_losses, label='Training Loss')
         plt.xlabel('Epoch')
-        plt.xticks(epochs)
         plt.ylabel('Loss')
         plt.title('Training Loss')
-        
-        #acc
-        plt.subplot(1,3,2)
+        plt.xticks(epochs[::5])  # Show every 5th tick
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(f"{folder}/loss_{timestamp}.png")
+        plt.show()
+        plt.close()
+
+        # ----------- Validation Accuracy Plot -----------
+        plt.figure(figsize=(10, 5))
         plt.plot(epochs, val_accs, label='Val Accuracy', color='orange')
         plt.xlabel('Epoch')
-        plt.xticks(epochs)
         plt.ylabel('Accuracy')
         plt.title('Validation Accuracy')
-        
-        #dice
-        plt.subplot(1,3,3)
+        plt.xticks(epochs[::5])
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(f"{folder}/accuracy_{timestamp}.png")
+        plt.show()        
+        plt.close()
+
+        # ----------- Dice Score Plot -----------
+        plt.figure(figsize=(10, 5))
         plt.plot(epochs, val_dice_scores, label='Dice Score', color='green')
         plt.xlabel('Epoch')
-        plt.xticks(epochs)
         plt.ylabel('Dice')
         plt.title('Dice Score')
-
+        plt.xticks(epochs[::5])
+        plt.grid(True)
         plt.tight_layout()
-        plt.savefig(f"{folder}/results_metrics_{timestamp}.png")
+        plt.savefig(f"{folder}/dice_{timestamp}.png")
         plt.show()
         plt.close()
 
