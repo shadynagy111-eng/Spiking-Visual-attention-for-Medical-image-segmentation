@@ -147,3 +147,5 @@ datasets/Modified_3_Brain_Tumor_Segmentation/*
 datasets/notebooks/*.gif
 checkpoints/*
 Att_Res_SNN_gradcam_results/*
+Att_Res_SNN_saved_images/*
+Att_Res_SNN_checkpoints/*

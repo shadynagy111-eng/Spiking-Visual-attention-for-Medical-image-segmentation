@@ -174,6 +174,13 @@ class BasicBlock(nn.Module):
                 bias=False,
             ),
             batch_norm_2d1(out_channels * BasicBlock.expansion),
+            # PruningCell(
+            #     out_channels * BasicBlock.expansion,
+            #     T=4,
+            #     attention="TCSA",
+            #     c_ratio=8,
+            #     t_ratio=1,
+            # ),
             PruningCell(
                 out_channels * BasicBlock.expansion,
                 T=1,
@@ -203,32 +210,79 @@ class BasicBlock(nn.Module):
     def forward(self, x):
         return self.residual_function(x) + self.shortcut(x)
 
+class SpikingSegmentationLayer(nn.Module):
+    def __init__(self, in_channels, time_window=1):
+        super().__init__()
+        self.time_window = time_window
+        self.layers = nn.Sequential(
+            self._make_block(in_channels, 256),
+            self._make_block(256, 128),
+            self._make_block(128, 64),
+            self._make_block(64, 32),
+            self._make_output_block(32, 16)
+        )
+    
+    def _make_block(self, in_ch, out_ch):
+        return nn.Sequential(
+            mem_update(),
+            Snn_Conv2d(in_ch, out_ch, kernel_size=3, padding=1, bias=False),
+            batch_norm_2d(out_ch),
+            TimeDistributedUpsample(scale_factor=2)
+        )
+    
+    def _make_output_block(self, in_ch, out_ch):
+        return nn.Sequential(
+            mem_update(),
+            Snn_Conv2d(in_ch, out_ch, kernel_size=3, padding=1, bias=False),
+            batch_norm_2d(out_ch),
+            TimeDistributedUpsample(scale_factor=2),
+            mem_update(),
+            Snn_Conv2d(out_ch, 1, kernel_size=1, bias=False),
+            batch_norm_2d(1)
+        )
+    
+    def forward(self, x):
+        x = x.unsqueeze(0).repeat(self.time_window, 1, 1, 1, 1)
+        return self.layers(x).mean(dim=0)
 
+class TimeDistributedUpsample(nn.Module):
+    def __init__(self, scale_factor=None, size=None, mode='bilinear', align_corners=False):
+        super().__init__()
+        self.scale_factor = scale_factor
+        self.size = size
+        self.mode = mode
+        self.align_corners = align_corners
+        
+    def forward(self, x):
+        # x shape: [T,B,C,H,W]
+        T, B, C, H, W = x.shape
+        x = x.view(T*B, C, H, W)  # Merge time and batch dimensions
+        x = F.interpolate(x, scale_factor=self.scale_factor, size=self.size, 
+                         mode=self.mode, align_corners=self.align_corners)
+        _, _, new_H, new_W = x.shape
+        return x.view(T, B, C, new_H, new_W)  # Restore original dimensions
+    
 class ResNet_origin(nn.Module):
     # Channel：
     def __init__(self, block, num_block):
         super().__init__()
         k = 1
         self.in_channels = 64 * k
-        # batch_norm_2d = group_norm_2d
+
         self.conv1 = nn.Sequential(
             Snn_Conv2d(1, 64 * k, kernel_size=7, padding=3, bias=False, stride=2),
-            # Snn_Conv2d(3, 64 * k, kernel_size=3, padding=1, stride=2),
-            # Snn_Conv2d(64 * k, 64 * k, kernel_size=3, padding=1, stride=1),
-            # Snn_Conv2d(64 * k, 64 * k, kernel_size=3, padding=1, stride=1),
             batch_norm_2d(64 * k),
         )
+
         self.pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        # nn.ReLU(inplace=True))
-        # we use a different inputsize than the original paper
-        # so conv2_x's stride is 1
         self.mem_update = mem_update()
+
         self.conv2_x = self._make_layer(block, 64 * k, num_block[0], 2)
         self.conv3_x = self._make_layer(block, 128 * k, num_block[1], 2)
         self.conv4_x = self._make_layer(block, 256 * k, num_block[2], 2)
         self.conv5_x = self._make_layer(block, 512 * k, num_block[3], 2)
 
-        # self.segmentation_head = nn.Sequential(
+        # self.segmentation_layer = nn.Sequential(
         #     nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),  # 8x8 → 16x16
         #     nn.ReLU(inplace=True),
         #     nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),  # 16x16 → 32x32
@@ -238,21 +292,21 @@ class ResNet_origin(nn.Module):
         #     nn.Conv2d(64, 1, kernel_size=1),                       
         # )
 
-        self.segmentation_head = nn.Sequential(
-            nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),  # 8x8 → 16x16
-            nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),  # 16x16 → 32x32
-            nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),   # 32x32 → 64x64
-            nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2),    # 64x64 → 128x128
-            nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(32, 16, kernel_size=2, stride=2),    # 128x128 → 256x256
-            nn.ReLU(inplace=True),
-            nn.Conv2d(16, 1, kernel_size=1),                        
-        )
+        # self.segmentation_layer = nn.Sequential(
+        #     nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),  # 8x8 → 16x16
+        #     nn.ReLU(inplace=True),
+        #     nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),  # 16x16 → 32x32
+        #     nn.ReLU(inplace=True),
+        #     nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),   # 32x32 → 64x64
+        #     nn.ReLU(inplace=True),
+        #     nn.ConvTranspose2d(64, 32, kernel_size=2, stride=2),    # 64x64 → 128x128
+        #     nn.ReLU(inplace=True),
+        #     nn.ConvTranspose2d(32, 16, kernel_size=2, stride=2),    # 128x128 → 256x256
+        #     nn.ReLU(inplace=True),
+        #     nn.Conv2d(16, 1, kernel_size=1),                        
+        # )
 
-        # self.segmentation_head = nn.Sequential(
+        # self.segmentation_layer = nn.Sequential(
         #     nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),  # 8x8 → 16x16
         #     nn.ReLU(inplace=True),
         #     nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2), # 16x16 → 32x32
@@ -268,8 +322,7 @@ class ResNet_origin(nn.Module):
         #     nn.Conv2d(8, 1, kernel_size=1),                        
         # )
 
-
-
+        self.segmentation_layer = SpikingSegmentationLayer(512, 1)
 
     def _make_layer(self, block, out_channels, num_blocks, stride):
         """make resnet layers(by layer i didnt mean this 'layer' was the
@@ -325,7 +378,7 @@ class ResNet_origin(nn.Module):
 
         # output = F.interpolate(output, size=(256,256), mode="bilinear", align_corners=False)
 
-        output = self.segmentation_head(output) 
+        output = self.segmentation_layer(output) 
         
         return output
 
