@@ -108,7 +108,7 @@ def check_accuracy(loader, model, device="cuda"):
             x = x.to(device)
             y = y.to(device).unsqueeze(1)
             preds = torch.sigmoid(model(x))
-            preds = (preds > THRESHOLD).float()
+            preds = (preds > THRESHOLD).float() 
             num_correct += (preds == y).sum()
             num_pixels += torch.numel(preds)
             dice_score += (2 * (preds * y).sum()) / ((preds + y).sum() + 1e-8)
@@ -132,6 +132,7 @@ def save_predictions_as_imgs(
     train_losses, 
     val_accs, 
     val_dice_scores, 
+    train_nasar, 
     folder="Att_Res_SNN_saved_images/", 
     device="cuda", 
     show_last_epoch=False, 
@@ -220,6 +221,19 @@ def save_predictions_as_imgs(
         plt.grid(False)
         plt.tight_layout()
         plt.savefig(f"{folder}/dice_{timestamp}.png")
+        plt.show()
+        plt.close()
+
+        # ----------- NASAR Plot ----------- 
+        plt.figure(figsize=(10, 5))
+        plt.plot(epochs, train_nasar, label='Training NASAR', color='red')
+        plt.xlabel('Epoch')
+        plt.ylabel('NASAR')
+        plt.title('Network Average Spiking Activity Rate (NASAR)')
+        plt.xticks(epochs[::5])
+        plt.grid(False)
+        plt.tight_layout()
+        plt.savefig(f"{folder}/nasar_{timestamp}.png")
         plt.show()
         plt.close()
 

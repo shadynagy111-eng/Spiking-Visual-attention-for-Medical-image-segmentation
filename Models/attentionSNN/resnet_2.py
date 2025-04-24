@@ -23,9 +23,8 @@ class ActFun(torch.autograd.Function):
         temp = temp / (2 * lens)
         return grad_input * temp.float()
 
-
 act_fun = ActFun.apply
-# membrane potential update
+
 
 
 class mem_update(nn.Module):
@@ -46,6 +45,10 @@ class mem_update(nn.Module):
             spike = act_fun(mem)
             mem_old = mem.clone()
             output[i] = spike
+
+        self.total_spikes = spike.sum().item()
+        self.total_neurons = spike.numel()
+
         return output
 
 
@@ -256,12 +259,50 @@ class TimeDistributedUpsample(nn.Module):
     def forward(self, x):
         # x shape: [T,B,C,H,W]
         T, B, C, H, W = x.shape
-        x = x.view(T*B, C, H, W)  # Merge time and batch dimensions
+        x = x.view(T*B, C, H, W)  
         x = F.interpolate(x, scale_factor=self.scale_factor, size=self.size, 
                          mode=self.mode, align_corners=self.align_corners)
         _, _, new_H, new_W = x.shape
         return x.view(T, B, C, new_H, new_W)  # Restore original dimensions
-    
+
+# class SpikingSegmentationLayer(nn.Module):
+#     def __init__(self, in_channels, time_window=1):
+#         super().__init__()
+#         self.time_window = time_window
+#         self.layers = nn.Sequential(
+#             self._make_block(512, 256),
+#             self._make_block(256, 128),
+#             self._make_block(128, 64),
+#             self._make_block(64, 32),
+#             self._make_block(32, 16),
+#             self._make_output()
+#         )
+
+#     def _make_block(self, in_ch, out_ch):
+#         return nn.Sequential(
+#             Snn_ConvTranspose2d(in_ch, out_ch, kernel_size=2, stride=2),
+#             mem_update(),  
+#             batch_norm_2d(out_ch)
+#         )
+
+#     def _make_output(self):
+#         return nn.Sequential(
+#             Snn_Conv2d(16, 1, kernel_size=1),
+#             mem_update()
+#         )
+
+#     def forward(self, x):
+#         x = x.unsqueeze(0).repeat(self.time_window, 1, 1, 1, 1)  # [T,B,C,H,W]
+#         return self.layers(x).mean(dim=0)
+
+# class Snn_ConvTranspose2d(nn.ConvTranspose2d):
+#     def forward(self, input):
+#         T, B, C, H, W = input.size()
+#         input = input.reshape(T*B, C, H, W)
+#         output = super().forward(input)
+#         _, _, new_H, new_W = output.shape
+#         return output.view(T, B, self.out_channels, new_H, new_W)
+   
 class ResNet_origin(nn.Module):
     # Channel：
     def __init__(self, block, num_block):
@@ -323,6 +364,22 @@ class ResNet_origin(nn.Module):
         # )
 
         self.segmentation_layer = SpikingSegmentationLayer(512, 1)
+
+    def calculate_nasar(self):
+        """
+        Calculate Network Average Spiking Activity Rate (NASAR)
+        """
+        total_spikes = 0
+        total_neurons = 0
+
+        for module in self.modules():
+            if isinstance(module, mem_update):
+                total_spikes += module.total_spikes
+                total_neurons += module.total_neurons
+
+        nasar = total_spikes / total_neurons if total_neurons > 0 else 0
+        print(f"NASAR: {nasar}")
+        return nasar
 
     def _make_layer(self, block, out_channels, num_blocks, stride):
         """make resnet layers(by layer i didnt mean this 'layer' was the

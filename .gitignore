@@ -140,6 +140,7 @@ Models/unet/saved_images/*
 Models/unet/unet_saved_images/*
 Models/unet/preprocess_plots/*
 Models/unet/gradcam_results/*
+Models/unet/plots/*
 datasets/Brain Tumor Segmentation/*
 datasets/Modified_Brain_Tumor_Segmentation/*
 datasets/Modified_2_Brain_Tumor_Segmentation/*
@@ -149,3 +150,4 @@ checkpoints/*
 Att_Res_SNN_gradcam_results/*
 Att_Res_SNN_saved_images/*
 Att_Res_SNN_checkpoints/*
+docs/*
