@@ -75,8 +75,6 @@ class TCSA(nn.Module):
 
         self.ca = ChannelAttention(channels)
         self.ta = TimeAttention(timeWindows)
-        # self.ta = TimeAttention(channels)
-        
         self.sa = SpatialAttention()
 
         self.stride = stride
