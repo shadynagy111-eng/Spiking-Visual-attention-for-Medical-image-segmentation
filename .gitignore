@@ -151,3 +151,5 @@ Att_Res_SNN_gradcam_results/*
 Att_Res_SNN_saved_images/*
 Att_Res_SNN_checkpoints/*
 docs/*
+Models/TCSA_SNN/Att_Res_SNN_gradcam_results/*
+Models/TCSA_SNN/Att_Res_SNN_saved_images/*
