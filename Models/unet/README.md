@@ -65,10 +65,15 @@ Update the corresponding variables in the code to reflect your drive path.
 
 ### Quantitative Results
 
-| Metric           | Value  |
-|------------------|--------|
-| Dice Coefficient | 0.7354 |
-| Accuracy         | 99.28  |
+| Metric            | Value       |
+| ----------------- | ----------- |
+| Accuracy          | 99.18       |
+| Dice Coefficient  | 0.779       |
+| Parameters        | 31,036,481  |
+| MACs              | 54.69 GMac  |
+| Power             | **\_\_\_**  |
+| CO2 emission      | **\_\_\_**  |
+| Training Duration | **\_\_\_**  |
 
 ### Qualitative Results
 
