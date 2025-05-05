@@ -7,6 +7,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import random as rand
+import pandas as pd
 
 rand.seed(55)
 
@@ -238,4 +239,49 @@ def save_predictions_as_imgs(
         plt.close()
 
     model.train()
-    
+
+def summarize_eco2ai_log(path="eco2ai_logs.csv"):
+    try:
+        df = pd.read_csv(path)
+    except FileNotFoundError:
+        print(f"❌ File not found: {path}")
+        return
+
+    if df.empty:
+        print("⚠ Log file is empty.")
+        return
+
+    print("✅ Log loaded successfully.\n")
+
+    # Summary
+    total_duration = df["duration"].sum()
+    total_energy = df["energy_consumed"].sum()
+    total_emissions = df["emissions"].sum()
+
+    print("🔍 Summary:")
+    print(f"   🕒 Duration: {total_duration:.2f} seconds")
+    print(f"   ⚡ Energy Consumed: {total_energy:.4f} kWh")
+    print(f"   🌱 CO₂ Emissions: {total_emissions:.4f} kg")
+
+    # Convert timestamp to datetime if present
+    if "timestamp" in df.columns:
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        x_axis = df["timestamp"]
+    else:
+        x_axis = range(len(df))
+
+    # Plot
+    plt.figure(figsize=(10, 4))
+    plt.plot(x_axis, df["energy_consumed"], marker='o', label='Energy (kWh)')
+    plt.plot(x_axis, df["emissions"], marker='x', label='CO₂ Emission (kg)')
+    plt.xlabel("Epoch" if isinstance(x_axis[0], int) else "Timestamp")
+    plt.ylabel("Value")
+    plt.title("Energy & CO₂ Emission per Epoch")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.xticks(rotation=45)
+    plt.show()
+    plt.savefig("attentionSNN_eco2ai_summary_plot.png")
+    print("✅ Summary plot saved as 'attentionSNN_eco2ai_summary_plot.png'.")
+    plt.close()

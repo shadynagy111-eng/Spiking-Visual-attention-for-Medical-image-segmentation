@@ -6,10 +6,11 @@ import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 import random as rand
+import pandas as pd
 
 rand.seed(55)
 
-CHECKPOINT_DIR = "Att_Res_SNN_checkpoints"
+CHECKPOINT_DIR = "Att_TCSA_SNN_checkpoints"
 THRESHOLD = 0.5
 
 def save_checkpoint(state, is_best=False):
@@ -19,11 +20,11 @@ def save_checkpoint(state, is_best=False):
 
     existing_files = os.listdir(CHECKPOINT_DIR)
     checkpoint_ids = [
-        int(f.split("_")[4]) for f in existing_files if f.startswith("Att_Res_SNN_checkpoint_")
+        int(f.split("_")[4]) for f in existing_files if f.startswith("Att_TCSA_SNN_checkpoint_")
     ]
     next_id = max(checkpoint_ids, default=0) + 1
 
-    checkpoint_filename = f"Att_Res_SNN_checkpoint_{next_id}_{timestamp}.pth.tar"
+    checkpoint_filename = f"Att_TCSA_SNN_checkpoint_{next_id}_{timestamp}.pth.tar"
     checkpoint_path = os.path.join(CHECKPOINT_DIR, checkpoint_filename)
 
     if is_best:
@@ -32,7 +33,7 @@ def save_checkpoint(state, is_best=False):
     else:
         print(f" Checkpoint not saved as best model.")
 
-    return f"Att_Res_SNN_checkpoint_{next_id}_{timestamp}"
+    return f"Att_TCSA_SNN_checkpoint_{next_id}_{timestamp}"
 
 def load_checkpoint(model, optimizer, checkpoint_name=None):
     if checkpoint_name is None:
@@ -132,14 +133,14 @@ def save_predictions_as_imgs(
     val_accs, 
     val_dice_scores, 
     train_nasar, 
-    folder="Att_Res_SNN_saved_images/", 
+    folder="Att_TCSA_SNN_saved_images/", 
     device="cuda", 
     show_last_epoch=False, 
 ):
     folder  = os.path.join(folder, checkpoint_filename)
     if not os.path.exists(folder):
         os.makedirs(folder)
-    new_folder = os.path.join(folder, "Att_Res_SNN_MatplotOutputs/")
+    new_folder = os.path.join(folder, "Att_TCSA_SNN_MatplotOutputs/")
     if not os.path.exists(new_folder):
         os.makedirs(new_folder)
     
@@ -237,4 +238,49 @@ def save_predictions_as_imgs(
         plt.close()
 
     model.train()
-    
+
+def summarize_eco2ai_log(path="eco2ai_logs.csv"):
+    try:
+        df = pd.read_csv(path)
+    except FileNotFoundError:
+        print(f"❌ File not found: {path}")
+        return
+
+    if df.empty:
+        print("⚠ Log file is empty.")
+        return
+
+    print("✅ Log loaded successfully.\n")
+
+    # Summary
+    total_duration = df["duration"].sum()
+    total_energy = df["energy_consumed"].sum()
+    total_emissions = df["emissions"].sum()
+
+    print("🔍 Summary:")
+    print(f"   🕒 Duration: {total_duration:.2f} seconds")
+    print(f"   ⚡ Energy Consumed: {total_energy:.4f} kWh")
+    print(f"   🌱 CO₂ Emissions: {total_emissions:.4f} kg")
+
+    # Convert timestamp to datetime if present
+    if "timestamp" in df.columns:
+        df["timestamp"] = pd.to_datetime(df["timestamp"])
+        x_axis = df["timestamp"]
+    else:
+        x_axis = range(len(df))
+
+    # Plot
+    plt.figure(figsize=(10, 4))
+    plt.plot(x_axis, df["energy_consumed"], marker='o', label='Energy (kWh)')
+    plt.plot(x_axis, df["emissions"], marker='x', label='CO₂ Emission (kg)')
+    plt.xlabel("Epoch" if isinstance(x_axis[0], int) else "Timestamp")
+    plt.ylabel("Value")
+    plt.title("Energy & CO₂ Emission per Epoch")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.xticks(rotation=45)
+    plt.show()
+    plt.savefig("TCSA_SNN_eco2ai_summary_plot.png")
+    print("✅ Summary plot saved as 'TCSA_SNN_eco2ai_summary_plot.png'.")
+    plt.close()

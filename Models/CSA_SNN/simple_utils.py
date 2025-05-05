@@ -1,18 +1,17 @@
 import torch
 import torchvision
-from dataset import BrainTumorSegmentationDataset
+from simple_dataset import BrainTumorSegmentationDataset
 from torch.utils.data import DataLoader
 import os
 from datetime import datetime
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 import random as rand
 import pandas as pd
 
 rand.seed(55)
 
-CHECKPOINT_DIR = "U_Net_checkpoints"
-THRESHOLD = 0.4
+CHECKPOINT_DIR = "Att_CSA_SNN_checkpoints"
+THRESHOLD = 0.5
 
 def save_checkpoint(state, is_best=False):
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
@@ -21,11 +20,11 @@ def save_checkpoint(state, is_best=False):
 
     existing_files = os.listdir(CHECKPOINT_DIR)
     checkpoint_ids = [
-        int(f.split("_")[3]) for f in existing_files if f.startswith("U_Net_checkpoint_")
+        int(f.split("_")[4]) for f in existing_files if f.startswith("Att_CSA_SNN_checkpoint_")
     ]
-    next_id = max(checkpoint_ids, default=0) + 1 
+    next_id = max(checkpoint_ids, default=0) + 1
 
-    checkpoint_filename = f"U_Net_checkpoint_{next_id}_{timestamp}.pth.tar"
+    checkpoint_filename = f"Att_CSA_SNN_checkpoint_{next_id}_{timestamp}.pth.tar"
     checkpoint_path = os.path.join(CHECKPOINT_DIR, checkpoint_filename)
 
     if is_best:
@@ -34,8 +33,7 @@ def save_checkpoint(state, is_best=False):
     else:
         print(f" Checkpoint not saved as best model.")
 
-    return f"U_Net_checkpoint_{next_id}_{timestamp}"
-
+    return f"Att_CSA_SNN_checkpoint_{next_id}_{timestamp}"
 
 def load_checkpoint(model, optimizer, checkpoint_name=None):
     if checkpoint_name is None:
@@ -43,7 +41,7 @@ def load_checkpoint(model, optimizer, checkpoint_name=None):
         if not files:
             print("❌ No checkpoints found!")
             return
-        checkpoint_name = files[0]  
+        checkpoint_name = files[0] 
 
     checkpoint_path = os.path.join(CHECKPOINT_DIR, checkpoint_name)
 
@@ -108,9 +106,9 @@ def check_accuracy(loader, model, device="cuda"):
     with torch.no_grad():
         for x, y in loader:
             x = x.to(device)
-            y = y.to(device).unsqueeze(1) 
+            y = y.to(device).unsqueeze(1)
             preds = torch.sigmoid(model(x))
-            preds = (preds >= THRESHOLD).float()
+            preds = (preds > THRESHOLD).float()
             num_correct += (preds == y).sum()
             num_pixels += torch.numel(preds)
             dice_score += (2 * (preds * y).sum()) / ((preds + y).sum() + 1e-8)
@@ -125,8 +123,8 @@ def check_accuracy(loader, model, device="cuda"):
 
     model.train()
 
-    return val_acc, val_dice
- 
+    return val_acc, val_dice 
+
 def save_predictions_as_imgs(
     loader, 
     model, 
@@ -134,14 +132,15 @@ def save_predictions_as_imgs(
     train_losses, 
     val_accs, 
     val_dice_scores, 
-    folder="U_Net_saved_images/", 
+    train_nasar, 
+    folder="Att_CSA_SNN_saved_images/", 
     device="cuda", 
     show_last_epoch=False, 
 ):
     folder  = os.path.join(folder, checkpoint_filename)
     if not os.path.exists(folder):
         os.makedirs(folder)
-    new_folder = os.path.join(folder, "U_Net_MatplotOutputs/")
+    new_folder = os.path.join(folder, "Att_CSA_SNN_MatplotOutputs/")
     if not os.path.exists(new_folder):
         os.makedirs(new_folder)
     
@@ -153,7 +152,7 @@ def save_predictions_as_imgs(
         x = x.to(device=device)
         with torch.no_grad():
             preds = torch.sigmoid(model(x))
-            preds = (preds >= THRESHOLD).float()
+            preds = (preds > THRESHOLD).float()
         
         torchvision.utils.save_image(
             preds, f"{folder}/pred_{idx}-{timestamp}.png"
@@ -192,10 +191,11 @@ def save_predictions_as_imgs(
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
         plt.title('Training Loss')
-        plt.xticks(epochs[::5])
+        plt.xticks(epochs[::5])  # Show every 5th tick
         plt.grid(False)
         plt.tight_layout()
         plt.savefig(f"{folder}/loss_{timestamp}.png")
+        plt.show()
         plt.close()
 
         # ----------- Validation Accuracy Plot -----------
@@ -208,6 +208,7 @@ def save_predictions_as_imgs(
         plt.grid(False)
         plt.tight_layout()
         plt.savefig(f"{folder}/accuracy_{timestamp}.png")
+        plt.show()        
         plt.close()
 
         # ----------- Dice Score Plot -----------
@@ -220,6 +221,20 @@ def save_predictions_as_imgs(
         plt.grid(False)
         plt.tight_layout()
         plt.savefig(f"{folder}/dice_{timestamp}.png")
+        plt.show()
+        plt.close()
+
+        # ----------- NASAR Plot ----------- 
+        plt.figure(figsize=(10, 5))
+        plt.plot(epochs, train_nasar, label='Training NASAR', color='red')
+        plt.xlabel('Epoch')
+        plt.ylabel('NASAR')
+        plt.title('Network Average Spiking Activity Rate (NASAR)')
+        plt.xticks(epochs[::5])
+        plt.grid(False)
+        plt.tight_layout()
+        plt.savefig(f"{folder}/nasar_{timestamp}.png")
+        plt.show()
         plt.close()
 
     model.train()
@@ -266,6 +281,6 @@ def summarize_eco2ai_log(path="eco2ai_logs.csv"):
     plt.tight_layout()
     plt.xticks(rotation=45)
     plt.show()
-    plt.savefig("U_Net_eco2ai_summary_plot.png")
-    print("✅ Summary plot saved as 'U_Net_eco2ai_summary_plot.png'.")
+    plt.savefig("CSA_SNN_eco2ai_summary_plot.png")
+    print("✅ Summary plot saved as 'CSA_SNN_eco2ai_summary_plot.png'.")
     plt.close()
