@@ -253,13 +253,13 @@ def summarize_eco2ai_log(path="eco2ai_logs.csv"):
     print("✅ Log loaded successfully.\n")
 
     # Summary
-    total_duration = df["duration"].sum()
-    total_energy = df["energy_consumed"].sum()
-    total_emissions = df["emissions"].sum()
+    total_duration = df["duration(s)"].sum()
+    total_power = df["power_consumption(kWh)"].sum()
+    total_emissions = df["CO2_emissions(kg)"].sum()
 
     print("🔍 Summary:")
     print(f"   🕒 Duration: {total_duration:.2f} seconds")
-    print(f"   ⚡ Energy Consumed: {total_energy:.4f} kWh")
+    print(f"   ⚡ Power Consumed: {total_power:.4f} kWh")
     print(f"   🌱 CO₂ Emissions: {total_emissions:.4f} kg")
 
     # Convert timestamp to datetime if present
@@ -271,11 +271,11 @@ def summarize_eco2ai_log(path="eco2ai_logs.csv"):
 
     # Plot
     plt.figure(figsize=(10, 4))
-    plt.plot(x_axis, df["energy_consumed"], marker='o', label='Energy (kWh)')
-    plt.plot(x_axis, df["emissions"], marker='x', label='CO₂ Emission (kg)')
+    plt.plot(x_axis, df["power_consumption(kWh)"], marker='o', label='Power Consumption (kWh)')
+    plt.plot(x_axis, df["CO2_emissions(kg)"], marker='x', label='CO₂ Emission (kg)')
     plt.xlabel("Epoch" if isinstance(x_axis[0], int) else "Timestamp")
     plt.ylabel("Value")
-    plt.title("Energy & CO₂ Emission per Epoch")
+    plt.title("Power & CO₂ Emission per Epoch")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
