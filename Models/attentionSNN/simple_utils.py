@@ -281,7 +281,7 @@ def summarize_eco2ai_log(path="eco2ai_logs.csv"):
     plt.legend()
     plt.tight_layout()
     plt.xticks(rotation=45)
-    plt.show()
     plt.savefig("attentionSNN_eco2ai_summary_plot.png")
     print("✅ Summary plot saved as 'attentionSNN_eco2ai_summary_plot.png'.")
+    plt.show()
     plt.close()

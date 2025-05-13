@@ -271,6 +271,7 @@ def summarize_eco2ai_log(path="eco2ai_logs.csv"):
 
     # Plot
     plt.figure(figsize=(10, 4))
+    # plt.ylim(0, 0.005)
     plt.plot(x_axis, df["power_consumption(kWh)"], marker='o', label='Power Consumption (kWh)')
     plt.plot(x_axis, df["CO2_emissions(kg)"], marker='x', label='CO₂ Emission (kg)')
     plt.xlabel("Epoch" if isinstance(x_axis[0], int) else "Timestamp")
@@ -280,7 +281,7 @@ def summarize_eco2ai_log(path="eco2ai_logs.csv"):
     plt.legend()
     plt.tight_layout()
     plt.xticks(rotation=45)
-    plt.show()
     plt.savefig("CSA_SNN_eco2ai_summary_plot.png")
     print("✅ Summary plot saved as 'CSA_SNN_eco2ai_summary_plot.png'.")
+    plt.show()
     plt.close()

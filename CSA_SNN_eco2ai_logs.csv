@@ -1,3 +1,0 @@
-id,project_name,experiment_description,epoch,start_time,duration(s),power_consumption(kWh),CO2_emissions(kg),CPU_name,GPU_name,OS,region/country,cost
-eb2ae36d-b4a1-4a07-b478-e0f0443a3566,CSA_SNN_Training_Project,Training CSA Spiking Model,,2025-05-12 10:24:38,1093.207002401352,0.0112663946411114,0.0053009062770107,"Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz/1 device(s), TDP:45.0",NVIDIA GeForce GTX 1660 Ti 1 device(s),Windows,EG,0
-22da8962-cdd7-4843-ba44-132e29a0f9b2,CSA_SNN_Training_Project,Training CSA Spiking Model,N/A,2025-05-12 10:27:07,951.143360376358,0.011111038410326056,0.0052278102382888715,"Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz/1 device(s), TDP:45.0",NVIDIA GeForce GTX 1660 Ti 1 device(s),Windows,EG,0

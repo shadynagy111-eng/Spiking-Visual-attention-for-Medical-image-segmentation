@@ -185,7 +185,6 @@ class BasicBlock(nn.Module):
                 attention="CSA",
                 c_ratio=8,
                 t_ratio=1,
-                fbs=True,
             ),
         )
         # shortcut

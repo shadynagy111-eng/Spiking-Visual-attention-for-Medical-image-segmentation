@@ -153,3 +153,8 @@ Att_Res_SNN_checkpoints/*
 docs/*
 Models/TCSA_SNN/Att_Res_SNN_gradcam_results/*
 Models/TCSA_SNN/Att_Res_SNN_saved_images/*
+
+Models/TCSA_SNN/eco2ai/data/*
+Models/CSA_SNN/eco2ai/data/*
+Models/unet/eco2ai/data/*
+Models/attentionSNN/eco2ai/data/*
