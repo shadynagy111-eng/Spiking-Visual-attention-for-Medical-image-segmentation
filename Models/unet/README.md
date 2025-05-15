@@ -71,9 +71,9 @@ Update the corresponding variables in the code to reflect your drive path.
 | Dice Coefficient  | 0.779       |
 | Parameters        | 31,036,481  |
 | MACs              | 54.69 GMac  |
-| Power             | 0.1039 kWh  |
-| CO2 emission      | 0.0488 kg   |
-| Training Duration | 4123.16 seconds |
+| Power             |  0.1126 kWh  |
+| CO2 emission      |  0.0530 kg   |
+| Training Duration | 4654.17 seconds |
 
 ### Qualitative Results
 
