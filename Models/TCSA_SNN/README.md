@@ -14,7 +14,7 @@ The TCSA_SNN model is optimized for temporal dynamics in spiking neural networks
 
 | Metric            | Value       |
 | ----------------- | ----------- |
-| Accuracy          | 99.12       |
+| Accuracy          | 99.12 %      |
 | Dice Coefficient  | 0.773       |
 | Parameters        | 22,982,497  |
 | MACs              | 763.78 MMac |

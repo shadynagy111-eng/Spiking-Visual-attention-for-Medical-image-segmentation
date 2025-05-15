@@ -12,7 +12,7 @@ The AttentionSNN model focuses on improving segmentation accuracy by dynamically
 
 | Metric            | Value      |
 | ----------------- | ---------- |
-| Accuracy          | 97.94      |
+| Accuracy          | 97.94 %    |
 | Dice Coefficient  | 0.503      |
 | Parameters        | 23,483,986 |
 | MACs              | 16.82 MMac |

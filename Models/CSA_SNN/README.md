@@ -12,7 +12,7 @@ The CSA_SNN model is designed to leverage the power efficiency of spiking neural
 
 | Metric            | Value      |
 | ----------------- | ---------- |
-| Accuracy          | 99.13      |
+| Accuracy          | 99.13 %      |
 | Dice Coefficient  | 0.763      |
 | Parameters        | 22,610,529 |
 | MACs              | 693.08 MMac|
