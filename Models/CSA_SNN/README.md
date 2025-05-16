@@ -10,14 +10,14 @@ The CSA_SNN model is designed to leverage the power efficiency of spiking neural
 
 ### Quantitative Results
 
-| Metric            | Value      |
-| ----------------- | ---------- |
-| Accuracy          | 99.13 %      |
-| Dice Coefficient  | 0.763      |
-| Parameters        | 22,610,529 |
-| MACs              | 693.08 MMac|
-| Power             | 0.0394 kWh |
-| CO2 emission      | 0.0187 kg  |
+| Metric            | Value           |
+| ----------------- | --------------- |
+| Accuracy          | 99.13 %         |
+| Dice Coefficient  | 0.763           |
+| Parameters        | 22,610,529      |
+| MACs              | 693.08 MMac     |
+| Power             | 0.0394 kWh      |
+| CO2 emission      | 0.0187 kg       |
 | Training Duration | 3659.15 seconds |
 
 ![CSA_SNN Training Loss](./../../assets/CSA_SNN_Training_Loss.png)
@@ -33,3 +33,7 @@ The CSA_SNN model is designed to leverage the power efficiency of spiking neural
 ![CSA_SNN Masks Output](./../../assets/CSA_SNN_Masks.png)
 
 ![CSA_SNN Grad-CAM Output](./../../assets/CSA_SNN_Grad_CAM.png)
+
+## Environmental Impact
+
+![CSA_SNN Eco2AI Summary](./eco2ai/CSA_SNN_eco2ai_summary_plot.png)

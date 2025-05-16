@@ -10,15 +10,15 @@ The AttentionSNN model focuses on improving segmentation accuracy by dynamically
 
 ### Quantitative Results
 
-| Metric            | Value      |
-| ----------------- | ---------- |
-| Accuracy          | 97.94 %    |
-| Dice Coefficient  | 0.503      |
-| Parameters        | 23,483,986 |
-| MACs              | 16.82 MMac |
-| Power             | **\_\_\_** |
-| CO2 emission      | **\_\_\_** |
-| Training Duration | **\_\_\_** |
+| Metric            | Value           |
+| ----------------- | --------------- |
+| Accuracy          | 97.94 %         |
+| Dice Coefficient  | 0.503           |
+| Parameters        | 23,483,986      |
+| MACs              | 16.82 MMac      |
+| Power             | 0.0485 kWh      |
+| CO2 emission      | 0.0228 kg       |
+| Training Duration | 1939.52 seconds |
 
 ### Qualitative Results
 
@@ -35,3 +35,7 @@ The AttentionSNN model focuses on improving segmentation accuracy by dynamically
 ![AttentionSNN Masks Output](./../../assets/AttentionSNN_Masks.png)
 
 ![AttentionSNN Grad-CAM Output](./../../assets/AttentionSNN_Grad_CAM.png)
+
+## Environmental Impact
+
+![AttentionSNN Eco2AI Summary](./eco2ai/attentionSNN_eco2ai_summary_plot.png)

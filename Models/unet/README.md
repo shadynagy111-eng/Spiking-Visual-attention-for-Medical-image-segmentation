@@ -26,7 +26,6 @@ UNet is a convolutional neural network that was developed for biomedical image s
 
 To train the model, open the `train.ipynb` Jupyter Notebook and execute the cells in sequence. Ensure that all dependencies are installed and the dataset paths are correctly configured before running the notebook.
 
-
 ## Results
 
 ### Training Parameters
@@ -65,14 +64,14 @@ Update the corresponding variables in the code to reflect your drive path.
 
 ### Quantitative Results
 
-| Metric            | Value       |
-| ----------------- | ----------- |
-| Accuracy          | 99.18 %     |
-| Dice Coefficient  | 0.779       |
-| Parameters        | 31,036,481  |
-| MACs              | 54.69 GMac  |
-| Power             |  0.1126 kWh  |
-| CO2 emission      |  0.0530 kg   |
+| Metric            | Value           |
+| ----------------- | --------------- |
+| Accuracy          | 99.18 %         |
+| Dice Coefficient  | 0.779           |
+| Parameters        | 31,036,481      |
+| MACs              | 54.69 GMac      |
+| Power             | 0.1126 kWh      |
+| CO2 emission      | 0.0530 kg       |
 | Training Duration | 4654.17 seconds |
 
 ### Qualitative Results
@@ -80,9 +79,14 @@ Update the corresponding variables in the code to reflect your drive path.
 Below are some sample segmentation results:
 
 #### Plot Samples
+
 ![Plot Sample1](./../../assets/output-0-20250326-054245.png)
 ![Plot Sample2](./../../assets/output-0-20250326-054249.png)
 ![Plot Sample3](./../../assets/output-0-20250326-054255.png)
+
+## Environmental Impact
+
+![UNet Eco2AI Summary](./eco2ai/U_Net_eco2ai_summary_plot.png)
 
 ## Directory Structure
 
@@ -93,9 +97,9 @@ Below are some sample segmentation results:
 │   │   ├── utils.py
 │   │   ├── dataset.py
 │   │   ├── train.ipynb
-│   │   ├── README.md    
-│   │   ├── checkpoints    
-│   │   ├── saved_images            
+│   │   ├── README.md
+│   │   ├── checkpoints
+│   │   ├── saved_images
 │   │   └── ...
 │   └── ...
 ├── assets
