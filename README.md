@@ -36,7 +36,7 @@ The model integrates a **Convolutional Spiking Neural Network (CSNN)** for featu
 ## 🔬 Methodology
 
 1. **Dataset Preprocessing** - Normalization, augmentation, and conversion of MRI images into a format suitable for SNN processing.
-2. **Model Development** - Implementing a hybrid **CNN-SNN fusion model** with spike-based attention.
+2. **Model Development** - Implementing spike-based attention model.
 3. **Training & Evaluation** - Comparing performance with traditional CNNs in terms of accuracy and power efficiency.
 4. **Optimization** - Fine-tuning hyperparameters to enhance SNN learning dynamics.
 
