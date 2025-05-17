@@ -185,6 +185,7 @@ class BasicBlock(nn.Module):
                 attention="CSA",
                 c_ratio=8,
                 t_ratio=1,
+                fbs=True,
             ),
         )
         # shortcut
@@ -232,6 +233,8 @@ class ResNet_origin(nn.Module):
         self.conv3_x = self._make_layer(block, 128 * k, num_block[1], 2)
         self.conv4_x = self._make_layer(block, 256 * k, num_block[2], 2)
         self.conv5_x = self._make_layer(block, 512 * k, num_block[3], 2)
+
+        self.dropout = nn.Dropout2d(0.2)
 
         # self.upsampling_layer = nn.Sequential(
         #     nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),  # 8x8 → 16x16
@@ -330,6 +333,8 @@ class ResNet_origin(nn.Module):
 
         # Collapse over time: average membrane potentials across T
         output = output.mean(dim=0)  # Shape: [B, C, H, W]
+
+        output = self.dropout(output)
 
         output = self.upsampling_layer(output) 
         return output
