@@ -252,20 +252,32 @@ def summarize_eco2ai_log(path="eco2ai_logs.csv"):
         df["timestamp"] = pd.to_datetime(df["timestamp"])
         x_axis = df["timestamp"]
     else:
-        x_axis = range(len(df))
-
-    # Plot
+        x_axis = range(len(df))    # Plot Power Consumption
     plt.figure(figsize=(10, 4))
-    plt.plot(x_axis, df["power_consumption(kWh)"], marker='o', label='Power Consumption (kWh)')
-    plt.plot(x_axis, df["CO2_emissions(kg)"], marker='x', label='CO₂ Emission (kg)')
+    plt.plot(x_axis, df["power_consumption(kWh)"], marker='o', color='blue', label='Power Consumption (kWh)')
     plt.xlabel("Epoch" if isinstance(x_axis[0], int) else "Timestamp")
-    plt.ylabel("Value")
-    plt.title("Power & CO₂ Emission per Epoch")
+    plt.ylabel("Power Consumption (kWh)")
+    plt.title("Power Consumption per Epoch")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
     plt.xticks(rotation=45)
-    plt.savefig("U_Net_eco2ai_summary_plot.png")
-    print("✅ Summary plot saved as 'U_Net_eco2ai_summary_plot.png'.")
+    plt.savefig("U_Net_power_consumption_plot.png")
+    print("✅ Power consumption plot saved as 'U_Net_power_consumption_plot.png'.")
+    plt.show()
+    plt.close()
+    
+    # Plot CO₂ Emission
+    plt.figure(figsize=(10, 4))
+    plt.plot(x_axis, df["CO2_emissions(kg)"], marker='x', color='green', label='CO₂ Emission (kg)')
+    plt.xlabel("Epoch" if isinstance(x_axis[0], int) else "Timestamp")
+    plt.ylabel("CO₂ Emission (kg)")
+    plt.title("CO₂ Emission per Epoch")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.xticks(rotation=45)
+    plt.savefig("U_Net_co2_emission_plot.png")
+    print("✅ CO₂ emission plot saved as 'U_Net_co2_emission_plot.png'.")
     plt.show()
     plt.close()

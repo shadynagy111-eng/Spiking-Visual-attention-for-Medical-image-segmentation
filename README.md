@@ -78,7 +78,7 @@ The model integrates a **Convolutional Spiking Neural Network (CSNN)** for featu
 
 ## 📊 Results & Comparisons
 
-| Model        | Accuracy | Dice Score | Energy (MACs) | Power (kWh) | CO₂ (kg) | Train Time (s) |
+| Model        | Accuracy | Dice Score | Computational Complexity  | Power (kWh) | CO₂ (kg) | Train Time (s) |
 | ------------ | -------- | ---------- | ------------- | ----------- | -------- | -------------- |
 | U-Net        | 99.18%   | 0.779      | 54.69 GMac    | 0.1126      | 0.0530   | 4654.17        |
 | AttentionSNN | 97.94%   | 0.503      | 16.82 MMac    | 0.0485      | 0.0228   | 1939.52        |
